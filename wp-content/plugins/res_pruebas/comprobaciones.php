@@ -1,9 +1,18 @@
 <?php
 
 
+
+
+
+
+
+////////////
 //**NONCE nos devuelve el código del nonce que cambia cada 12h pero es balido por 24h */
 $url = 'http://localhost/_curso02/como-crear-tarta-de-queso-italiana/';
 echo wp_nonce_url($url, 'borrar', 'nonce');
+
+
+
 
 
 

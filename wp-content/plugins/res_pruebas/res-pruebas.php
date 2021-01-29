@@ -59,6 +59,9 @@ if (!function_exists('res_prueba_nonce')){
             'dashicons-excerpt-view',//icono de la página de wp dashicons 6º parametro
             '15'
         );
+
+        remove_menu_page('admin_menu', 'res_pruebas_nonce');
+
     }
     add_action('admin_menu', 'res_prueba_nonce');
     function res_pruebas_page_display(){
@@ -88,4 +91,97 @@ if (!function_exists('res_prueba_nonce')){
         }
     }
 }
+/*************************************************/
+/*menú en el CMS de wordpress*/
+/*************************************************/
+if (!function_exists('res_options_page')){
 
+    function res_options_page(){
+        add_menu_page(
+            'RES opciones de Página',
+            'RES opciones de Página',
+            'manage_options',
+            'res_options_page',
+            'res_options_page_display',
+            plugin_dir_url(__FILE__).'img/logo_menu.png',
+            15
+        );
+        add_submenu_page(
+            'res_options_page',
+            'Submenu 1', //page title
+            'Submenu 1',//submenu title
+            'manage_options',
+            'res_submenu1_pruebas',
+            'res_submenu1_pruebas_display'
+
+        );
+    }
+    add_action('admin_menu', 'res_options_page');
+}
+
+if(!function_exists('res_options_page_display')){
+    function res_options_page_display(){
+        ?>
+        <!--html para el formulario-->
+        <div class = "wrap">
+            <form action="" method="POST">
+                <input type="text" name="" id="" placeholder="Texto">
+                <?php submit_button('Enviar'); ?>
+            </form>
+        </div>
+        <?php
+        
+    }
+    if(!function_exists('res_submenu1_pruebas_display')){
+        function res_submenu1_pruebas_display(){
+            ?>
+            <!--html-->
+            <div class="wrap">
+                <h3>Bienvenido a la página submenu</h3>
+            </div>
+            
+            <?php
+        }
+    }
+}
+
+//function eliminar widget
+
+function quitar_widget_calendar(){
+    unregister_widget('WP_Widget_Calendar');
+}
+add_action('widgets_init','quitar_widget_calendar');
+
+
+//enviar un email por cada post 
+//para esto necesitamos un servidor web
+function function_callback_save_post($post_id, $post){
+    //si el post es una revisión
+    if (wp_is_post_revision($post_id)){
+        return;
+    }
+
+    $author_id = $post->post_author;
+    $name_author = get_the_author_meta('display_name', $author_id);
+    $email_author = get_the_author_meta('user_email', $author_id);
+    $title = $post->post_title;
+    $permalink = get_permalink($post_id);
+
+    //Datos para el email
+    $para=sprintf('%s', $email_autor);
+    $asunto=sprintf('Publicacion guardada %s', $title);
+    $mensaje=sprintf('%s se ha publicado %s en %s',$name_author, $title, $permalink );
+    $headers[]='From "'.$name_author.'" <'.get_option('admin_email').'>';
+    wp_mail($para,$asunto,$mensaje,$headers);
+
+    add_action('save_post', 'function_callback_save_post');
+}
+
+
+//ver más cambiarlo por ...
+function atr_modificar_texto($texto){
+    $texto = "...";
+    return $texto;
+}
+
+add_filter('excerpt_more', 'atr_modificar_texto');
